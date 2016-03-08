@@ -14,6 +14,7 @@ function revDel(options, cb) {
 	// Useful when testing
 	options.delFn = options.delFn || del;
 	options.dest = options.dest || '.';
+	options.path = options.path || '.';
 
 	options.suppress = (options.suppress !== false);
 
@@ -26,11 +27,11 @@ function revDel(options, cb) {
 
 		if (options.base) {
 			oldFiles = _.map(oldFiles, function (file) {
-				return path.join(options.dest || options.base, file);
+				return path.join( options.path || options.base, file);
 			});
 		}
 
-		options.delFn(oldFiles, { force: options.force }).then(cb, cb);
+		return options.delFn(oldFiles, { force: options.force });
 	}
 
 	// newManifest isn't specified, return a stream
@@ -51,13 +52,11 @@ function revDel(options, cb) {
 			return cb(e);
 		}
 
-		revDel(options, function (err, filesDeleted) {
-			if (err) {
-				return cb(err);
-			}
-
+		revDel(options).then(function (filesDeleted) {
 			file.revDeleted = filesDeleted;
 			cb(null, file);
+		}, function (err) {
+			cb(err);
 		});
 	});
 }
