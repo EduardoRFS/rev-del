@@ -30,7 +30,7 @@ function revDel(options, cb) {
 			});
 		}
 
-		return options.delFn(oldFiles, { force: options.force }, cb);
+		options.delFn(oldFiles, { force: options.force }).then(cb, cb);
 	}
 
 	// newManifest isn't specified, return a stream
